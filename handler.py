@@ -4,8 +4,7 @@ import json
 # All Lambda layers are accessible within the /opt/ directory.
 nlp = spacy.load('/opt/en_core_web_sm-2.1.0')
 
-ERROR_MSG = 'Error: Please ensure that the `text` parameter is ' \
-            'being passed'
+ERROR_MSG = 'Error: Please ensure that the `text` parameter is being passed'
 
 
 def main(event, context):
