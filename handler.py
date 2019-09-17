@@ -1,36 +1,42 @@
+import spacy
 import json
+
+# All Lambda layers are accessible within the /opt/ directory.
+nlp = spacy.load('/opt/en_core_web_sm-2.1.0')
 
 ERROR_MSG = 'Error: Please ensure that the `text` parameter is ' \
             'being passed'
 
 
 def main(event, context):
-    """
-    The main handler function called when the Lambda function is invoked.
-     Arguments:
-         event {dict} -- Dictionary containing contents of the event that
-         invoked the function, primarily the payload of data to be processed.
-         context {LambdaContext} -- An object containing metadata describing
-         the event source and client details.
-     Returns:
-         [string|dict] -- An output object that does not impact the effect of
-         the function but which is reflected in CloudWatch
-     """
-    try:
-        query_string = event['queryStringParameters']['text']
-    except TypeError:
-        query_string = ERROR_MSG
+    def get_names(words):
+        doc = nlp(words)
+        names = []
 
-    body = {
-        'result': query_string
-    }
+        for ent in doc.ents:
+            if ent.label_ == 'PERSON':
+                entity = {
+                    'person': ent.text,
+                }
+                names.append(entity)
+        return names
+
+    try:
+        text = event['queryStringParameters']['text']
+    except TypeError:
+        text = ERROR_MSG
+
+    entities = None
+    if text is not ERROR_MSG:
+        entities = get_names(text)
 
     response = {
         'statusCode': 200,
         'headers': {
+            'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
         },
-        'body': json.dumps(body)
+        'body': json.dumps(entities)
     }
 
     return response

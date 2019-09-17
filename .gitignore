@@ -2,6 +2,7 @@
 __pycache__
 .idea/
 .Python
+en_core_web_sm-2.1.0
 env/
 build/
 develop-eggs/
