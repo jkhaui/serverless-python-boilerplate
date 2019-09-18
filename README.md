@@ -39,3 +39,5 @@ the layers is ~40mb).
 statements. This lets it write to CloudWatch logs for easier debugging. Serverless 
 claims that all functions have access to CloudWatch logs by default, but for some 
 reason, I didn't observe this.
+- Be wary using Pip on non-Linux systems for packages that contain compiled binary. 
+See https://aws.amazon.com/premiumsupport/knowledge-center/lambda-python-package-compatible/
