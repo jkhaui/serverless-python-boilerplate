@@ -2,18 +2,23 @@
 <img src="https://misc-ddocs.s3-ap-southeast-2.amazonaws.com/py-lambda.png" />
 
 Recently, I've found myself building a backend entirely out of serverless
-functions. Having used the Serverless framework to bootstrap my workflow, 
-I found this starter kit by Postlight which proved even more helpful for 
-a quick and simple scaffolding: https://github.com/postlight/serverless-babel-starter
+functions. Using the Serverless framework to bootstrap my workflow, I found 
+this starter kit by Postlight which provides quick and simple scaffolding: 
+https://github.com/postlight/serverless-babel-starter
 
-Now I'm switching over to Python and found it has its own unique challenges, 
-such as dealing with large libraries used for data science or machine learning. 
-Also, Serverless isn't as well integrated with Pip as it is with NPM; therefore, 
-there's more reliance on plugins such as serverless-python-requirements. 
-This boilerplate will hopefully make it simpler to deploy your Python code 
-to Lambda 🚀
+Now I'm switching from Node.js to Python which has its own challenges, such as 
+large dependencies for data science or machine learning. This boilerplate uses the 
+spaCy NLP library to demonstrate how **Lambda layers** can be leveraged to improve 
+the development process.
+
+After setting up the repo, send a GET or POST request to the endpoint with the key 
+'text' and the value as any body of text, e.g. 'Manchester United have been linked 
+with Harry Kane over the years amid the England international's stunning form at 
+Tottenham'. The function will extract the names of any people it detects (such as 
+'Harry Kane' in the example provided) and return the result in JSON. 🚀
 
 **Instructions**
+
 Ensure that you have Node.js, NPM, and the Serverless Framework installed. 
 Also ensure that your **AWS credentials are configured**. If in doubt, follow 
 these steps: https://serverless.com/framework/docs/providers/aws/guide/quick-start/
@@ -29,6 +34,9 @@ Then, to run and test locally at http://localhost:4000
 
 To deploy the entire function as part of a CloudFormation stack:
 > serverless deploy
+
+Try this sample GET request: 
+localhost:4000?text=Manchester%20United%20have%20been%20linked%20with%20Harry%20Kane%20over%20the%20years%20amid%20the%20England%20international%27s%20stunning%20form%20at%20Tottenham
 
 Enjoy!
 
