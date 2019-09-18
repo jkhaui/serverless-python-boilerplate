@@ -1,5 +1,6 @@
 # Distribution / packaging
-__pycache__
+__pycache__/
+_warmup/
 .idea/
 .Python
 en_core_web_sm-2.1.0/
