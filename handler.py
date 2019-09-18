@@ -1,36 +1,57 @@
+import spacy
 import json
 
-ERROR_MSG = 'Error: Please ensure that the `text` parameter is ' \
-            'being passed'
+ERROR_MSG = 'Please ensure that the `text` parameter is being passed'
+EMPTY_MSG = 'No people were detected from the text provided.'
 
 
 def main(event, context):
-    """
-    The main handler function called when the Lambda function is invoked.
-     Arguments:
-         event {dict} -- Dictionary containing contents of the event that
-         invoked the function, primarily the payload of data to be processed.
-         context {LambdaContext} -- An object containing metadata describing
-         the event source and client details.
-     Returns:
-         [string|dict] -- An output object that does not impact the effect of
-         the function but which is reflected in CloudWatch
-     """
-    try:
-        query_string = event['queryStringParameters']['text']
-    except TypeError:
-        query_string = ERROR_MSG
+    if 'isOffline' in event:
+        # All Lambda layers are accessible within the /opt/ directory.
+        nlp = spacy.load('en_core_web_sm-2.1.0')
+    else:
+        nlp = spacy.load('/opt/en_core_web_sm-2.1.0')
 
-    body = {
-        'result': query_string
-    }
+    # Return early to minimise resource usage if invoked by warmup plugin
+    if event.get('source') in ['aws.events', 'serverless-plugin-warmup']:
+        print('Keeping the Lambda warm...')
+        return {}
+
+    def get_names(text_):
+        doc = nlp(text_)
+        entities_ = []
+
+        for ent in doc.ents:
+            if ent.label_ == 'PERSON':
+                entity = {
+                    'person': ent.text,
+                }
+                entities_.append(entity)
+        return entities_
+
+    try:
+        text = event['queryStringParameters']['text']
+    except (TypeError, KeyError):
+        text = ERROR_MSG
+
+    if text is not ERROR_MSG:
+        entities = get_names(text)
+        if not entities:
+            entities = [{
+                'empty': EMPTY_MSG
+            }]
+    else:
+        entities = [{
+            'error': ERROR_MSG
+        }]
 
     response = {
         'statusCode': 200,
         'headers': {
+            'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
         },
-        'body': json.dumps(body)
+        'body': json.dumps(entities)
     }
 
     return response

@@ -1,7 +1,14 @@
-service: python3-lambda
+service: python3-spacy-lambda
 
 provider:
   name: aws
+  # Ensure our function has write access to cloudwatch logs.
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'logs:*'
+      Resource:
+        - '*'
   runtime: python3.7
   stage: dev
   region: ap-southeast-2
@@ -10,6 +17,9 @@ provider:
 functions:
   main:
     handler: handler.main
+    layers:
+      - arn:aws:lambda:ap-southeast-2:817496625479:layer:AWSLambda-Python37-SciPy1x:2
+      - arn:aws:lambda:ap-southeast-2:273047674297:layer:spacy_layer_lite:2
     events:
       - http:
           path: /
@@ -19,16 +29,34 @@ functions:
 plugins:
   - serverless-python-requirements
   - serverless-offline
-
+  - serverless-plugin-warmup
 custom:
   serverless-offline:
     port: 4000
   # https://github.com/UnitedIncome/serverless-python-requirements
+  warmup:
+    enabled: true
+    events:
+      - schedule: rate(5 minutes)
   pythonRequirements:
     # Docker must be installed on Windows/Mac:
     # https://serverless.com/blog/serverless-python-packaging/
     dockerizePip: non-linux
     # Reduces package size by removing directories like `PyCache`.
-    # Do not use this option on win32 systems.
+    # Do NOT use this option on win32 systems.
     # slim: true
     # strip: false
+
+package:
+  #  exclude:
+  #  - src/**
+  include:
+    - src/handler.py
+  exclude:
+    - node_modules/**
+    - venv/**
+    - en_core_web_sm-2.1.0/**
+    - .idea/**
+    - __pycache__/**
+    - package.json
+    - package-lock.json
