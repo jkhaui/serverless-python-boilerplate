@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
-    "serverless-offline": "^5.11.0",
+    "serverless-offline": "^12.0.4",
     "serverless-plugin-warmup": "^4.7.0-rc.1",
     "serverless-python-requirements": "^5.0.0"
   }
